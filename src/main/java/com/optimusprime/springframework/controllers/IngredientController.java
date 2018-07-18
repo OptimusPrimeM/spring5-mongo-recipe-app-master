@@ -71,6 +71,7 @@ public class IngredientController {
     @GetMapping("recipe/{recipeId}/ingredient/{id}/update")
     public String updateRecipeIngredient(@PathVariable String recipeId,
                                          @PathVariable String id, Model model){
+        log.debug("I'm in the controller of update Ingredient");
         model.addAttribute("ingredient", ingredientService.findByRecipeIdAndIngredientId(recipeId, id));
 
         model.addAttribute("uomList", unitOfMeasureService.listAllUoms());
