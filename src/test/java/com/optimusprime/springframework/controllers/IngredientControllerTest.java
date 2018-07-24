@@ -2,6 +2,7 @@ package com.optimusprime.springframework.controllers;
 
 import com.optimusprime.springframework.commands.IngredientCommand;
 import com.optimusprime.springframework.commands.RecipeCommand;
+import com.optimusprime.springframework.commands.UnitOfMeasureCommand;
 import com.optimusprime.springframework.services.IngredientService;
 import com.optimusprime.springframework.services.RecipeService;
 import com.optimusprime.springframework.services.UnitOfMeasureService;
@@ -12,8 +13,8 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
-import java.util.HashSet;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -66,7 +67,7 @@ public class IngredientControllerTest {
         IngredientCommand ingredientCommand = new IngredientCommand();
 
         //when
-        when(ingredientService.findByRecipeIdAndIngredientId(anyString(), anyString())).thenReturn(ingredientCommand);
+        when(ingredientService.findByRecipeIdAndIngredientId(anyString(), anyString())).thenReturn(Mono.just(ingredientCommand));
 
         //then
         mockMvc.perform(get("/recipe/1/ingredient/2/show"))
@@ -74,6 +75,27 @@ public class IngredientControllerTest {
                 .andExpect(view().name("recipe/ingredient/show"))
                 .andExpect(model().attributeExists("ingredient"));
     }
+
+//    @Test
+//    public void testNewIngredientForm() throws Exception {
+//        //given
+//        RecipeCommand recipeCommand = new RecipeCommand();
+//        recipeCommand.setId("1");
+//
+//        //when
+//        when(recipeService.findCommandById(anyString())).thenReturn(recipeCommand);
+//        when(unitOfMeasureService.listAllUoms()).thenReturn(new HashSet<>());
+//
+//        //then
+//        mockMvc.perform(get("/recipe/1/ingredient/new"))
+//                .andExpect(status().isOk())
+//                .andExpect(view().name("recipe/ingredient/ingredientform"))
+//                .andExpect(model().attributeExists("ingredient"))
+//                .andExpect(model().attributeExists("uomList"));
+//
+//        verify(recipeService, times(1)).findCommandById(anyString());
+//
+//    }
 
     @Test
     public void testNewIngredientForm() throws Exception {
@@ -83,7 +105,7 @@ public class IngredientControllerTest {
 
         //when
         when(recipeService.findCommandById(anyString())).thenReturn(recipeCommand);
-        when(unitOfMeasureService.listAllUoms()).thenReturn(new HashSet<>());
+        when(unitOfMeasureService.listAllUoms()).thenReturn(Flux.just(new UnitOfMeasureCommand()));
 
         //then
         mockMvc.perform(get("/recipe/1/ingredient/new"))
@@ -102,8 +124,8 @@ public class IngredientControllerTest {
         IngredientCommand ingredientCommand = new IngredientCommand();
 
         //when
-        when(ingredientService.findByRecipeIdAndIngredientId(anyString(), anyString())).thenReturn(ingredientCommand);
-        when(unitOfMeasureService.listAllUoms()).thenReturn(new HashSet<>());
+        when(ingredientService.findByRecipeIdAndIngredientId(anyString(), anyString())).thenReturn(Mono.just(ingredientCommand));
+        when(unitOfMeasureService.listAllUoms()).thenReturn(Flux.just(new UnitOfMeasureCommand()));
 
         //then
         mockMvc.perform(get("/recipe/1/ingredient/2/update"))
@@ -121,7 +143,7 @@ public class IngredientControllerTest {
         command.setRecipeId("2");
 
         //when
-        when(ingredientService.saveIngredientCommand(any())).thenReturn(command);
+        when(ingredientService.saveIngredientCommand(any())).thenReturn(Mono.just(command));
 
         //then
         mockMvc.perform(post("/recipe/2/ingredient")
@@ -137,6 +159,7 @@ public class IngredientControllerTest {
     @Test
     public void testDeleteIngredient() throws Exception {
 
+        when(ingredientService.deleteById(anyString(), anyString())).thenReturn(Mono.empty());
         //then
         mockMvc.perform(get("/recipe/2/ingredient/3/delete")
         )
