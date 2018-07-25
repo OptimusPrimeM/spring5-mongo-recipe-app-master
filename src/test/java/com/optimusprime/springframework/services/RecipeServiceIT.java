@@ -2,8 +2,8 @@ package com.optimusprime.springframework.services;
 
 import com.optimusprime.springframework.commands.RecipeCommand;
 import com.optimusprime.springframework.converters.RecipeCommandToRecipe;
-import com.optimusprime.springframework.domain.Recipe;
 import com.optimusprime.springframework.converters.RecipeToRecipeCommand;
+import com.optimusprime.springframework.domain.Recipe;
 import com.optimusprime.springframework.repositories.RecipeRepository;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -48,7 +48,7 @@ public class RecipeServiceIT {
 
         //when
         testRecipeCommand.setDescription(NEW_DESCRIPTION);
-        RecipeCommand savedRecipeCommand = recipeService.saveRecipeCommand(testRecipeCommand);
+        RecipeCommand savedRecipeCommand = recipeService.saveRecipeCommand(testRecipeCommand).block();
 
         //then
         assertEquals(NEW_DESCRIPTION, savedRecipeCommand.getDescription());
