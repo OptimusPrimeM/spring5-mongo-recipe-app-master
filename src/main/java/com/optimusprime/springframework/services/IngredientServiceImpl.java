@@ -6,6 +6,7 @@ import com.optimusprime.springframework.converters.IngredientToIngredientCommand
 import com.optimusprime.springframework.domain.Ingredient;
 import com.optimusprime.springframework.domain.Recipe;
 import com.optimusprime.springframework.repositories.RecipeRepository;
+import com.optimusprime.springframework.repositories.UnitOfMeasureRepository;
 import com.optimusprime.springframework.repositories.reactive.RecipeReactiveRepository;
 import com.optimusprime.springframework.repositories.reactive.UnitOfMeasureReactiveRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +26,7 @@ public class IngredientServiceImpl implements IngredientService {
     private final IngredientToIngredientCommand ingredientToIngredientCommand;
     private final IngredientCommandToIngredient ingredientCommandToIngredient;
     private final RecipeRepository recipeRepository;
-//    private final UnitOfMeasureRepository unitOfMeasureRepository;
+    private final UnitOfMeasureRepository unitOfMeasureRepository;
 
     private final RecipeReactiveRepository recipeReactiveRepository;
     private final UnitOfMeasureReactiveRepository unitOfMeasureReactiveRepository;
@@ -42,24 +43,38 @@ public class IngredientServiceImpl implements IngredientService {
     public IngredientServiceImpl(IngredientToIngredientCommand ingredientToIngredientCommand,
                                  IngredientCommandToIngredient ingredientCommandToIngredient,
                                  RecipeRepository recipeRepository, RecipeReactiveRepository recipeReactiveRepository,
-                                 UnitOfMeasureReactiveRepository unitOfMeasureReactiveRepository) {
+                                 UnitOfMeasureReactiveRepository unitOfMeasureReactiveRepository,
+                                 UnitOfMeasureRepository unitOfMeasureRepository) {
         this.ingredientToIngredientCommand = ingredientToIngredientCommand;
         this.ingredientCommandToIngredient = ingredientCommandToIngredient;
         this.recipeRepository = recipeRepository;
         this.recipeReactiveRepository = recipeReactiveRepository;
         this.unitOfMeasureReactiveRepository = unitOfMeasureReactiveRepository;
+        this.unitOfMeasureRepository =unitOfMeasureRepository;
     }
 
     @Override
     public Mono<IngredientCommand> findByRecipeIdAndIngredientId(String recipeId, String ingredientId) {
 
-        return recipeReactiveRepository
-                .findById(recipeId)
-                .flatMapIterable(Recipe::getIngredients)
-                .filter(ingredient -> ingredient.getId().equalsIgnoreCase(ingredientId))
-                .single()
+//        return recipeReactiveRepository
+//                .findById(recipeId)
+//                .flatMapIterable(Recipe::getIngredients)
+//                .filter(ingredient -> ingredient.getId().equalsIgnoreCase(ingredientId))
+//                .single()
+//                .map(ingredient -> {
+//                    IngredientCommand command =ingredientToIngredientCommand.convert(ingredient);
+//                    command.setRecipeId(recipeId);
+//                    return command;
+//                });
+
+        return recipeReactiveRepository.findById(recipeId)
+                .map(recipe -> recipe.getIngredients()
+                        .stream()
+                        .filter(ingredient -> ingredient.getId().equalsIgnoreCase(ingredientId))
+                        .findFirst())
+                .filter(Optional::isPresent)
                 .map(ingredient -> {
-                    IngredientCommand command =ingredientToIngredientCommand.convert(ingredient);
+                    IngredientCommand command =ingredientToIngredientCommand.convert(ingredient.get());
                     command.setRecipeId(recipeId);
                     return command;
                 });
@@ -88,8 +103,7 @@ public class IngredientServiceImpl implements IngredientService {
                 Ingredient ingredientFound = ingredientOptional.get();
                 ingredientFound.setDescription(command.getDescription());
                 ingredientFound.setAmount(command.getAmount());
-                ingredientFound.setUom(unitOfMeasureReactiveRepository
-                        .findById(command.getUom().getId()).block());
+                ingredientFound.setUom(unitOfMeasureReactiveRepository.findById(command.getUom().getId()).block());
                 if (ingredientFound.getUom() == null) {
                     new RuntimeException("UOM NOT FOUND");
                 }

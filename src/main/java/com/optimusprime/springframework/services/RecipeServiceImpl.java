@@ -41,16 +41,6 @@ public class RecipeServiceImpl implements RecipeService {
     @Override
     public Mono<RecipeCommand> findCommandById(String id) {
 
-//        RecipeCommand recipeCommand = recipeToRecipeCommand.convert(findById(id).block());
-//
-//        //enhance command object with id value
-//        if(recipeCommand.getIngredients() != null && recipeCommand.getIngredients().size() > 0){
-//            recipeCommand.getIngredients().forEach(rc -> {
-//                rc.setRecipeId(recipeCommand.getId());
-//            });
-//        }
-//
-//        return recipeCommand;
         return recipeReactiveRepository.findById(id)
                 .map(recipe -> {
                     RecipeCommand recipeCommand= recipeToRecipeCommand.convert(recipe);
