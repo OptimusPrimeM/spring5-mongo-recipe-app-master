@@ -8,6 +8,7 @@ import com.optimusprime.springframework.converters.UnitOfMeasureToUnitOfMeasureC
 import com.optimusprime.springframework.domain.Ingredient;
 import com.optimusprime.springframework.domain.Recipe;
 import com.optimusprime.springframework.repositories.RecipeRepository;
+import com.optimusprime.springframework.repositories.UnitOfMeasureRepository;
 import com.optimusprime.springframework.repositories.reactive.RecipeReactiveRepository;
 import com.optimusprime.springframework.repositories.reactive.UnitOfMeasureReactiveRepository;
 import org.junit.Before;
@@ -32,8 +33,8 @@ public class IngredientServiceImplTest {
     @Mock
     RecipeReactiveRepository recipeReactiveRepository;
 //
-//    @Mock
-//    UnitOfMeasureRepository unitOfMeasureRepository;
+    @Mock
+UnitOfMeasureRepository unitOfMeasureRepository;
     @Mock
     UnitOfMeasureReactiveRepository unitOfMeasureReactiveRepository;
 
@@ -51,7 +52,7 @@ public class IngredientServiceImplTest {
 
         ingredientService = new IngredientServiceImpl(ingredientToIngredientCommand, ingredientCommandToIngredient,
                 recipeRepository, recipeReactiveRepository,
-                unitOfMeasureReactiveRepository);
+                unitOfMeasureReactiveRepository,unitOfMeasureRepository);
     }
 
     @Test

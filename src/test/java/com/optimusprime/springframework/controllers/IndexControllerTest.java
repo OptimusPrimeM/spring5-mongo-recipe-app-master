@@ -49,7 +49,7 @@ public class IndexControllerTest {
 //                .andExpect(status().isOk())
 //                .andExpect(view().name("index"));
 
-        webTestClient
+
     }
 
     @Test
